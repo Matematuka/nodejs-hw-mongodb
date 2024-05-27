@@ -27,7 +27,6 @@ const setuptServer = () => {
 
   app.get('/contacts', async (req, res) => {
     const contacts = await getContacts();
-
     res.status(200).json({
       status: `${res.statusCode}`,
       message: 'Successfully found contacts!',
