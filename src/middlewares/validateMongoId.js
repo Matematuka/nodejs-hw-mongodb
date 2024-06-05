@@ -1,12 +1,12 @@
 import createHttpError from 'http-errors';
-import { isValidObjecrId } from 'mongoose';
+import { isValidObjectId } from 'mongoose';
 
 export const validateMogoId =
   (idName = 'id') =>
   (req, res, next) => {
     const id = req.params[idName];
 
-    if (!isValidObjecrId(id)) {
+    if (!isValidObjectId(id)) {
       return next(createHttpError(400, 'Invalid id'));
     }
 
