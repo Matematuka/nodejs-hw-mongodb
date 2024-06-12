@@ -7,7 +7,7 @@ import {
   deleteContactController,
 } from '../controllers/contacts.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
-// import { validateMogoId } from '../middlewares/validateMongoId.js';
+import { authenticate } from '../middlewares/authenticate.js';
 import {
   createContactSchema,
   updateContactSchema,
@@ -16,7 +16,7 @@ import { validateBody } from '../middlewares/validateBody.js';
 
 const router = Router();
 
-// router.use('/contacts/:contactId', validateMogoId('contactId'));
+router.use(authenticate);
 
 router.get('/', ctrlWrapper(getContactsController));
 router.get('/:contactId', ctrlWrapper(getContactByIdController));
