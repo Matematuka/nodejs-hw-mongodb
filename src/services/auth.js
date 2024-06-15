@@ -7,11 +7,15 @@ import { SessionsCollection } from '../db/models/session.js';
 import { FIFTEEN_MINUTES, ONE_MONTH } from '../constants/index.js';
 
 export const registerUser = async (payload) => {
-  const encryptedPassword = await bcrypt.hash(payload.password, 10);
+  const user = await UsersCollection.findOne({ email: payload.email });
+  if (user) {
+    throw createHttpError(409, 'Email in use');
+  }
 
+  const hashedPassword = await bcrypt.hash(payload.password, 10);
   return await UsersCollection.create({
     ...payload,
-    password: encryptedPassword,
+    password: hashedPassword,
   });
 };
 
