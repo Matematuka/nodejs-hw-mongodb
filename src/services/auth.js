@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import { UsersCollection } from '../db/models/user.js';
 import { SessionsCollection } from '../db/models/session.js';
 import {
+  ENV_VARS,
   FIFTEEN_MINUTES,
   ONE_MONTH,
   TEMPLATES_DIR,
@@ -108,7 +109,7 @@ export const requestResetToken = async (email) => {
       sub: user._id,
       email,
     },
-    env('JWT_SECRET'),
+    env(ENV_VARS.JWT_SECRET),
     {
       expiresIn: '15m',
     },
@@ -126,9 +127,8 @@ export const requestResetToken = async (email) => {
   const template = handlebars.compile(templateSource);
   const html = template({
     name: user.name,
-    link: `${env('APP_DOMAIN')}/reset-password?token=${resetToken}`,
+    link: `${env(ENV_VARS.APP_DOMAIN)}/reset-password?token=${resetToken}`,
   });
-
   await sendEmail({
     from: env(SMTP.SMTP_FROM),
     to: email,
