@@ -9,7 +9,7 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
-import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import saveFile from '../utils/saveFile.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -66,7 +66,7 @@ export const createContactController = async (req, res) => {
   let photoUrl;
 
   if (photo) {
-    photoUrl = await saveFileToCloudinary(photo);
+    photoUrl = await saveFile(photo);
   }
 
   const contact = await createContact({
@@ -89,23 +89,27 @@ export const patchContactController = async (req, res, next) => {
   let photoUrl;
 
   if (photo) {
-    photoUrl = await saveFileToCloudinary(photo);
+    photoUrl = await saveFile(photo);
   }
 
-  const result = await patchContact(contactId, {
-    ...req.body,
-    photo: photoUrl,
-  });
+  const result = await patchContact(
+    contactId,
+    { userId: req.user._id },
+    {
+      ...req.body,
+      photo: photoUrl,
+    },
+  );
 
   if (!result) {
-    next(createHttpError(404, 'Student not found'));
+    next(createHttpError(404, 'Contact not found'));
     return;
   }
 
   res.json({
     status: 200,
     message: `Successfully patched a contact!`,
-    data: result.student,
+    data: result.contact,
   });
 };
 

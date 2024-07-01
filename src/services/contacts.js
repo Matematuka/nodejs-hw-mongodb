@@ -47,15 +47,28 @@ export const createContact = async (payload) => {
   return contact;
 };
 
-export const patchContact = async (contactId, payload, userId) => {
+export const patchContact = async (
+  contactId,
+  userId,
+  { photo, ...payload },
+  options = {},
+) => {
   const rawResult = await contactsCollection.findOneAndUpdate(
     { _id: contactId, userId },
-    payload,
+    { photo, ...payload },
     {
       new: true,
+      includeResultMetadata: true,
+      ...options,
     },
   );
-  return rawResult;
+
+  if (!rawResult || !rawResult.value) return null;
+
+  return {
+    contact: rawResult.value,
+    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+  };
 };
 
 export const deleteContact = async (contactId, userId) => {

@@ -11,3 +11,5 @@ export const saveFileToUploadDir = async (file) => {
 
   return `${env(ENV_VARS.APP_DOMAIN)}/uploads/${file.filename}`;
 };
+
+export default saveFileToUploadDir;
