@@ -9,7 +9,9 @@ import createHttpError from 'http-errors';
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
-import saveFile from '../utils/saveFile.js';
+import saveFileToUploadDir from '../utils/saveFileToUploadDir.js';
+import saveFileToCloudinary from '../utils/saveFileToCloudinary.js';
+import { env } from '../utils/env.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -62,52 +64,66 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
+  const newContact = req.body;
+  newContact.userId = req.user._id;
   const photo = req.file;
+
   let photoUrl;
 
   if (photo) {
-    photoUrl = await saveFile(photo);
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
   }
 
-  const contact = await createContact({
-    ...req.body,
-    userId: req.user._id,
+  const createdContact = await createContact({
+    ...newContact,
     photo: photoUrl,
-    ...req.body,
   });
 
   res.status(201).json({
-    status: 201,
-    message: `Successfully created a contact!`,
-    data: contact,
+    status: '201',
+    message: 'Successfully created contact!',
+    data: createdContact,
   });
 };
 
-export const patchContactController = async (req, res, next) => {
+export const patchContactController = async (req, res) => {
   const { contactId } = req.params;
   const photo = req.file;
+  const userId = req.user._id;
 
   let photoUrl;
 
   if (photo) {
-    photoUrl = await saveFile(photo);
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
   }
 
-  const result = await patchContact(
-    contactId,
-    { userId: req.user._id },
-    { photo: photoUrl, ...req.body },
-  );
+  const patch = req.body;
 
-  if (!result) {
-    next(createHttpError(404, 'Contact not found'));
-    return;
+  const result = await patchContact(contactId, userId, {
+    ...patch,
+    photo: photoUrl,
+  });
+
+  if (!result || !contactId) {
+    return res.status(404).json({
+      status: '404',
+      message: 'Contact not found',
+      data: null,
+    });
   }
 
-  res.json({
-    status: 200,
-    message: `Successfully patched a contact!`,
-    data: result.contact,
+  res.status(200).json({
+    status: '200',
+    message: 'Successfully patched a contact!',
+    data: result,
   });
 };
 
