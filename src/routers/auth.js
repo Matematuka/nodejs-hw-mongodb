@@ -54,7 +54,7 @@ router.post(
   ctrlWrapper(resetPasswordController),
 );
 
-router.get('/get-oauth-url', ctrlWrapper(getGoogleOAuthUrlController));
+router.post('/get-oauth-url', ctrlWrapper(getGoogleOAuthUrlController));
 
 router.post(
   '/confirm-oauth',
