@@ -1,13 +1,10 @@
 import { OAuth2Client } from 'google-auth-library';
 import path from 'node:path';
 import fs from 'node:fs';
-// import { readFile } from 'fs/promises';
 import createHttpError from 'http-errors';
 
 import { env } from './env.js';
 import { GOOGLE_AUTH } from '../constants/index.js';
-
-// const PATH_JSON = path.join(process.cwd(), 'google.json');
 
 const oauthConfig = JSON.parse(
   fs.readFileSync(path.join(process.cwd(), 'google.json')).toString(),
@@ -22,8 +19,8 @@ const googleOAuthClient = new OAuth2Client({
 export const generateAuthUrl = () =>
   googleOAuthClient.generateAuthUrl({
     scope: [
-      '<https://www.googleapis.com/auth/userinfo.email>',
-      '<https://www.googleapis.com/auth/userinfo.profile>',
+      'https://www.googleapis.com/auth/userinfo.email',
+      'https://www.googleapis.com/auth/userinfo.profile',
     ],
   });
 

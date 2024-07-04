@@ -1,21 +1,56 @@
 openapi: 3.1.0
 info:
   version: 1.0.0
-  title: <назва вашого додатку>
+  title: Contacts API
   license:
     name: Apache 2.0
     url: <http://www.apache.org/licenses/LICENSE-2.0.html>
   description: >
-    <опис вашого додатку>
+    API для керування контактами користувачів
 tags:
   # теги, що ви будете використовувати
+  - name: Auth
+    description: Operations about auth
+  - name: Contacts
+    description: Operations about contacts
 servers:
-  - url: <http://localhost:3000>
-  - url: #посилання на задеплоєний сайт
+  - url: https://nodejs-hw-mongodb-qggc.onrender.com
+  # - url: localhost:3000
 paths:
   # тут будуть посилання на ендпоінти
+  /auth/register:
+    post:
+      $ref: '../swagger/paths/auth/register_post.yaml'
+  /auth/login:
+    post:
+      $ref: '../swagger/paths/auth/login_post.yaml'
+  /auth/refresh:
+    post:
+      $ref: '../swagger/paths/auth/refresh_post.yaml'
+  /auth/send-reset-email:
+    post:
+      $ref: '../swagger/paths/auth/send-reset-email_post.yaml'
+  /auth/reset-pwd:
+    post:
+      $ref: '../swagger/paths/auth/reset-pwd_post.yaml'
+  /auth/logout:
+    post:
+      $ref: '../swagger/paths/auth/logout_post.yaml'
+  /contacts:
+    post:
+      $ref: '../swagger/paths/contacts/post.yaml'
+    get:
+      $ref: ../swagger/paths/contacts/get.yaml
+  /contacts/{contactId}:
+    get:
+      $ref: ../swagger/paths/contacts/{contactId}/get.yaml
+    patch:
+      $ref: ../swagger/paths/contacts/{contactId}/patch.yaml
+    delete:
+      $ref: ../swagger/paths/contacts/{contactId}/delete.yaml
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
+      bearerFormat: JWT
